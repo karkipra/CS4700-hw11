@@ -19,8 +19,8 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
 
 int main(){
     // Block and Tile Size
-    int N = 16;
-    int T = 8;
+    int N = 64;
+    int T = 1;
     size_t memSize = N * N * sizeof(int);
     
     printf("Running on N = %d\n", N);
@@ -58,7 +58,7 @@ int main(){
 
     // launch kernel
     dim3 dimGrid(N, N);
-    dim3 dimBlock(1, 1);
+    dim3 dimBlock(T, T);
     mtxMult<<< dimGrid, dimBlock >>>(d_A, d_B, d_C, N);
 
     // device to host copy
