@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <sys/time.h> 
 
 __global__ void mtxMult(float *A, float *B, float *C, int N){
 
@@ -17,9 +18,9 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
     C[row * N + col] = temp;
 }
 
-int main(){
+void setup(int dim){
     // Block and Tile Size
-    int N = 1024;
+    int N = dim;
     int T = 1;
     size_t memSize = N * N * sizeof(int);
     
@@ -51,6 +52,7 @@ int main(){
         }
     }
 
+    clock_t begin = clock();
     // Copy host array to device array
     cudaMemcpy(d_A, h_A, memSize, cudaMemcpyHostToDevice);
     cudaMemcpy(d_B, h_B, memSize, cudaMemcpyHostToDevice);
@@ -63,6 +65,9 @@ int main(){
 
     // device to host copy
     cudaMemcpy(C_GPU, d_C, memSize, cudaMemcpyDeviceToHost );
+    clock_t end = clock();
+    double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+    printf("%dx%d Execution on CUDA: %lf seconds\n", N, N, time_spent);
 
     // Run program sequentially
     for (int i = 0; i < N; i++){
@@ -72,22 +77,9 @@ int main(){
                 temp += h_A[i*N + k] * h_B[k * N+j];
             }
             C_CPU[i * N + j] = temp;
-            printf("C_CPU[%d] = %f and C_GPU[%d] = %f\n", i * N + j, C_CPU[i * N + j], i * N + j, C_GPU[i * N + j]);
+            //printf("C_CPU[%d] = %f and C_GPU[%d] = %f\n", i * N + j, C_CPU[i * N + j], i * N + j, C_GPU[i * N + j]);
         }
     }
-
-    /*
-    printf("First 20 C CPU: ");
-    for (int i = 0; i < 20; i++){
-        printf("%f ", C_CPU[i]);
-    }
-    printf("\n");
-
-    printf("First 20 C GPU: ");
-    for (int i = 0; i < 20; i++){
-        printf("%f ", C_GPU[i]);
-    }
-    printf("\n");
 
     printf("Verifying program correctness.... ");
     // verify the data returned to the host is correct
@@ -96,18 +88,32 @@ int main(){
             assert(C_CPU[i*N + j] == C_GPU[i*N + j]);
         }
     }
-    printf("Everthing checks out!\n");*/
+    printf("Everthing checks out!\n");
 
     // free host memory
     free(h_A);
     free(h_B);
     free(C_CPU);
     free(C_GPU);
-
+    
     // free device memory
     cudaFree(d_A);
     cudaFree(d_B);
     cudaFree(d_C);
+}
+
+int main(){
+    // test run on 64 dim
+    printf("Running 64x64...\n");
+    setup(64);
+
+    // 4096*4096
+    printf("Running 4096x4096...\n");
+    //setup(4096);
+
+    // 8192*8192
+    printf("Running 8192x8192...\n");
+    //setup(8192);
 
     return 0;
 } // qsub hw11.sh -q UI-GPU -I ngpus=1
