@@ -57,8 +57,8 @@ int main(){
     cudaMemcpy(d_C, C_CPU, memSize, cudaMemcpyHostToDevice);
 
     // launch kernel
-    dim3 dimGrid(N/T);
-    dim3 dimBlock(T);
+    dim3 dimGrid(N, N);
+    dim3 dimBlock(1, 1);
     mtxMult<<< dimGrid, dimBlock >>>(d_A, d_B, d_C, N);
 
     // device to host copy
