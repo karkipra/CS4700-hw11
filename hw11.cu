@@ -73,9 +73,11 @@ int main(){
                 temp += h_A[i*N + k] * h_B[k * N+j];
             }
             C_CPU[i * N + j] = temp;
+            printf("C_CPU[%d] = %f and C_GPU[%d] = %f\n", i * N + j, C_CPU[i * N + j], i * N + j, C_GPU[i * N + j]);
         }
     }
 
+    /*
     printf("First 20 C CPU: ");
     for (int i = 0; i < 20; i++){
         printf("%f ", C_CPU[i]);
@@ -95,7 +97,7 @@ int main(){
             assert(C_CPU[i*N + j] == C_GPU[i*N + j]);
         }
     }
-    printf("Everthing checks out!\n");
+    printf("Everthing checks out!\n");*/
 
     // free host memory
     free(h_A);
