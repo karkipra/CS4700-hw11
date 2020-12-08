@@ -4,6 +4,11 @@
 #include <sys/time.h> 
 
 /*
+    References
+    - no sharing method done from Andrew's office hours help
+*/
+
+/*
     mtxMult - perform matrix multiplication
     @params arrays A, B, C and dimension size N
     @return - void 
@@ -114,9 +119,9 @@ void setup(int dim, bool isSmall){
 }
 
 int main(){
-    // test run on 64 dim
-    printf("Running 64x64...\n");
-    setup(64, true);
+    // test run on 1024 dim
+    printf("Running 1024x1024...\n");
+    setup(1024, true);
 
     // 4096*4096
     printf("Running 4096x4096...\n");
