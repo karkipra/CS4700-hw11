@@ -3,6 +3,11 @@
 #include <assert.h>
 #include <sys/time.h> 
 
+/*
+    mtxMult - perform matrix multiplication
+    @params arrays A, B, C and dimension size N
+    @return - void 
+*/
 __global__ void mtxMult(float *A, float *B, float *C, int N){
 
     int row = blockIdx.y*blockDim.y+threadIdx.y;
@@ -18,6 +23,11 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
     C[row * N + col] = temp;
 }
 
+/*
+    setup - sets up the host and device arrays for calculation
+    @params dim - dimensions of the arrays, isSmall - boolean to check whether the dimensions are small
+    @return - void 
+*/
 void setup(int dim, bool isSmall){
     // Block and Tile Size
     int N = dim;
