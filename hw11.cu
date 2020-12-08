@@ -20,7 +20,7 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
 int main(){
     // Block and Tile Size
     int N = 64;
-    int T = 1;
+    int T = 8;
     size_t memSize = N * N * sizeof(int);
     
     printf("Running on N = %d\n", N);
