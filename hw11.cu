@@ -59,7 +59,7 @@ int main(){
 
     // launch kernel
     dim3 dimGrid(N);
-    dim3 dimBlock(T);
+    dim3 dimBlock(N/T);
     mtxMult<<< dimGrid, dimBlock >>>(d_A, d_B, d_C, N);
 
     // device to host copy
