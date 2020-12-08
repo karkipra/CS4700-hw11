@@ -78,13 +78,13 @@ int main(){
 
     printf("First 20 C CPU: ");
     for (int i = 0; i < 20; i++){
-        printf("%d ", C_CPU[i]);
+        printf("%f ", C_CPU[i]);
     }
     printf("\n");
 
     printf("First 20 C GPU: ");
     for (int i = 0; i < 20; i++){
-        printf("%d ", C_GPU[i]);
+        printf("%f ", C_GPU[i]);
     }
     printf("\n");
 
