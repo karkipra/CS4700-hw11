@@ -12,16 +12,16 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
     if(row < N && col < N){
         // compute for each thread
         for (int i = 0; i < N; i++) {
-            tmpSum += A[row * N + i] * B[i * N + col];
+            temp += A[row * N + i] * B[i * N + col];
         }
     }
-    C[row * N + col] = tmpSum;
+    C[row * N + col] = temp;
 }
 
 int main(){
     // Block and Tile Size
     int N = 64;
-    int T = 8;
+    //int T = 8;
     size_t memSize = N * N * sizeof(int);
     
     printf("Running on N = %d\n", N);
@@ -30,10 +30,10 @@ int main(){
     float* h_B;
     float* C_CPU;
     float* C_GPU;
-    h_A = (int *) malloc(memSize);
-    h_B = (int *) malloc(memSize);
-    C_CPU = (int *) malloc(memSize);
-    C_GPU = (int *) malloc(memSize);
+    h_A = (float *) malloc(memSize);
+    h_B = (float *) malloc(memSize);
+    C_CPU = (float *) malloc(memSize);
+    C_GPU = (float *) malloc(memSize);
 
     // Allocate device memory
     float* d_A; 
@@ -97,7 +97,7 @@ int main(){
     cudaFree(d_C);
 
     return 0;
-} // qsub hw10.sh -q UI-GPU -I ngpus=1
+} // qsub hw11.sh -q UI-GPU -I ngpus=1
 
 
 
