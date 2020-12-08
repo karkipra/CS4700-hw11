@@ -76,11 +76,23 @@ int main(){
         }
     }
 
+    printf("First 20 C CPU: ");
+    for (int i = 0; i < 20; i++){
+        printf("%d ", C_CPU[i]);
+    }
+    printf("\n");
+
+    printf("First 20 C GPU: ");
+    for (int i = 0; i < 20; i++){
+        printf("%d ", C_GPU[i]);
+    }
+    printf("\n");
+
     printf("Verifying program correctness.... ");
     // verify the data returned to the host is correct
     for (int i = 0; i < N; i++){
         for(int j = 0; j < N; j++){
-            assert(C_CPU[i*N + j] == C_CPU[i*N + j]);
+            assert(C_CPU[i*N + j] == C_GPU[i*N + j]);
         }
     }
     printf("Everthing checks out!\n");
