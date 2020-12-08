@@ -110,11 +110,11 @@ int main(){
 
     // 4096*4096
     printf("Running 4096x4096...\n");
-    setup(4096, false);
+    //setup(4096, false);
 
     // 8192*8192
     printf("Running 8192x8192...\n");
-    setup(8192, false);
+    //setup(8192, false);
 
     return 0;
 } // qsub hw11.sh -q UI-GPU -I ngpus=1
