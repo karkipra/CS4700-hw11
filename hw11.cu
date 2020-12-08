@@ -95,7 +95,7 @@ void setup(int dim){
     free(h_B);
     free(C_CPU);
     free(C_GPU);
-    
+
     // free device memory
     cudaFree(d_A);
     cudaFree(d_B);
@@ -109,11 +109,11 @@ int main(){
 
     // 4096*4096
     printf("Running 4096x4096...\n");
-    //setup(4096);
+    setup(4096);
 
     // 8192*8192
     printf("Running 8192x8192...\n");
-    //setup(8192);
+    setup(8192);
 
     return 0;
 } // qsub hw11.sh -q UI-GPU -I ngpus=1
