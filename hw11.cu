@@ -9,12 +9,11 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
 
     float temp = 0;
 
-    if(row < N && col < N){
-        // compute for each thread
-        for (int i = 0; i < N; i++) {
-            temp += A[row * N + i] * B[i * N + col];
-        }
+    // compute for each thread
+    for (int i = 0; i < N; i++) {
+        temp += A[row * N + i] * B[i * N + col];
     }
+    
     C[row * N + col] = temp;
 }
 
