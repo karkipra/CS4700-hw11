@@ -18,7 +18,7 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
     C[row * N + col] = temp;
 }
 
-void setup(int dim){
+void setup(int dim, bool isSmall){
     // Block and Tile Size
     int N = dim;
     int T = 1;
@@ -69,26 +69,27 @@ void setup(int dim){
     double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
     printf("%dx%d Execution on CUDA: %lf seconds\n", N, N, time_spent);
 
-    // Run program sequentially
-    for (int i = 0; i < N; i++){
-        for (int j = 0; j < N; j++){
-            float temp = 0;
-            for (int k = 0; k < N; k++){
-                temp += h_A[i*N + k] * h_B[k * N+j];
+    if(isSmall){
+        // Run program sequentially
+        for (int i = 0; i < N; i++){
+            for (int j = 0; j < N; j++){
+                float temp = 0;
+                for (int k = 0; k < N; k++){
+                    temp += h_A[i*N + k] * h_B[k * N+j];
+                }
+                C_CPU[i * N + j] = temp;
             }
-            C_CPU[i * N + j] = temp;
-            //printf("C_CPU[%d] = %f and C_GPU[%d] = %f\n", i * N + j, C_CPU[i * N + j], i * N + j, C_GPU[i * N + j]);
         }
-    }
-
-    printf("Verifying program correctness.... ");
-    // verify the data returned to the host is correct
-    for (int i = 0; i < N; i++){
-        for(int j = 0; j < N; j++){
-            assert(C_CPU[i*N + j] == C_GPU[i*N + j]);
+    
+        printf("Verifying program correctness.... ");
+        // verify the data returned to the host is correct
+        for (int i = 0; i < N; i++){
+            for(int j = 0; j < N; j++){
+                assert(C_CPU[i*N + j] == C_GPU[i*N + j]);
+            }
         }
+        printf("Everthing checks out!\n");
     }
-    printf("Everthing checks out!\n");
 
     // free host memory
     free(h_A);
@@ -105,15 +106,15 @@ void setup(int dim){
 int main(){
     // test run on 64 dim
     printf("Running 64x64...\n");
-    setup(64);
+    setup(64, true);
 
     // 4096*4096
     printf("Running 4096x4096...\n");
-    setup(4096);
+    setup(4096, false);
 
     // 8192*8192
     printf("Running 8192x8192...\n");
-    setup(8192);
+    setup(8192, false);
 
     return 0;
 } // qsub hw11.sh -q UI-GPU -I ngpus=1
