@@ -60,7 +60,7 @@ int main(){
     // launch kernel
     dim3 dimGrid(N);
     dim3 dimBlock(T);
-    mtxMult<<< blocksPerGrid, threadsPerBlock >>>(d_A, d_B, d_C, N);
+    mtxMult<<< dimGrid, dimBlock >>>(d_A, d_B, d_C, N);
 
     // device to host copy
     cudaMemcpy(C_GPU, d_C, memSize, cudaMemcpyDeviceToHost );
