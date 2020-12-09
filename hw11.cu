@@ -16,7 +16,7 @@
 */
 __global__ void sharedMtxMult(float *A, float *B, float *C, int N) {
     // Block Size
-    block_size = 8;
+    int block_size = 8;
 
     __shared__ float tile_a[block_size][block_size];
     __shared__ float tile_b[block_size][block_size];
