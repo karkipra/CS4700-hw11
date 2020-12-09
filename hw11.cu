@@ -9,26 +9,26 @@
     - shared method: https://stackoverflow.com/questions/18815489/cuda-tiled-matrix-matrix-multiplication-with-shared-memory-and-matrix-size-whic/18856054 
 */
 
+#define BLOCK_SIZE 8;
+
 /*
     mtxMult - perform matrix multiplication
     @params arrays A, B, C and dimension size N
     @return - void 
 */
 __global__ void sharedMtxMult(float *A, float *B, float *C, int N) {
-    // Block Size
-    int block_size = 8;
 
-    __shared__ float tile_a[block_size][block_size];
-    __shared__ float tile_b[block_size][block_size];
+    __shared__ float tile_a[BLOCK_SIZE][BLOCK_SIZE];
+    __shared__ float tile_b[BLOCK_SIZE][BLOCK_SIZE];
 
-    int row = blockIdx.y * block_size + threadIdx.y;
-    int col = blockIdx.x * block_size + threadIdx.x;
+    int row = blockIdx.y * BLOCK_SIZE + threadIdx.y;
+    int col = blockIdx.x * BLOCK_SIZE + threadIdx.x;
     float tmp = 0;
     int idx;
 
     for (int i = 0; i < gridDim.x; i++) {
         // A index
-        idx = row * N + i * block_size + threadIdx.x;
+        idx = row * N + i * BLOCK_SIZE + threadIdx.x;
         if(idx < N*N) {
             tile_a[threadIdx.y][threadIdx.x] = A[idx];
         } else {
@@ -36,7 +36,7 @@ __global__ void sharedMtxMult(float *A, float *B, float *C, int N) {
         }
 
         // B index
-        idx = (i * block_size + threadIdx.y) * N + col;
+        idx = (i * BLOCK_SIZE + threadIdx.y) * N + col;
         if(idx < N*N) {
             tile_b[threadIdx.y][threadIdx.x] = B[idx];
         } else {
@@ -45,7 +45,7 @@ __global__ void sharedMtxMult(float *A, float *B, float *C, int N) {
         __syncthreads();
 
         // update the temp (value of c)
-        for (int N = 0; N < block_size; N++) {
+        for (int N = 0; N < BLOCK_SIZE; N++) {
             tmp += tile_a[threadIdx.y][N] * tile_b[N][threadIdx.x];
         }
         __syncthreads();
@@ -84,7 +84,7 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
 void setup(int dim, bool isSmall){
     // Block and Tile Size
     int N = dim;
-    int T = 8;
+    int T = BLOCK_SIZE;
     size_t memSize = N * N * sizeof(int);
     
     printf("Running on N = %d\n", N);
