@@ -5,11 +5,59 @@
 
 /*
     References
-    - no sharing method done from Andrew's office hours help
+    - no sharing method: Help from Andrew's office hours 
+    - shared method: https://stackoverflow.com/questions/18815489/cuda-tiled-matrix-matrix-multiplication-with-shared-memory-and-matrix-size-whic/18856054 
 */
 
 /*
     mtxMult - perform matrix multiplication
+    @params arrays A, B, C and dimension size N
+    @return - void 
+*/
+__global__ void sharedMtxMult(float *A, float *B, float *C, int N) {
+    // Block Size
+    block_size = 8;
+
+    __shared__ float tile_a[block_size][block_size];
+    __shared__ float tile_b[block_size][block_size];
+
+    int row = blockIdx.y * block_size + threadIdx.y;
+    int col = blockIdx.x * block_size + threadIdx.x;
+    float tmp = 0;
+    int idx;
+
+    for (int i = 0; i < gridDim.x; i++) {
+        // A index
+        idx = row * N + i * block_size + threadIdx.x;
+        if(idx < N*N) {
+            tile_a[threadIdx.y][threadIdx.x] = A[idx];
+        } else {
+            tile_a[threadIdx.y][threadIdx.x] = 0;
+        }
+
+        // B index
+        idx = (i * block_size + threadIdx.y) * N + col;
+        if(idx < N*N) {
+            tile_b[threadIdx.y][threadIdx.x] = B[idx];
+        } else {
+            tile_b[threadIdx.y][threadIdx.x] = 0;
+        }
+        __syncthreads();
+
+        // update the temp (value of c)
+        for (int N = 0; N < block_size; N++) {
+            tmp += tile_a[threadIdx.y][N] * tile_b[N][threadIdx.x];
+        }
+        __syncthreads();
+    }
+    // Finally put the values in C
+    if(row < N && col < N) {
+        C[row * N + col] = tmp;
+    }
+}
+
+/*
+    mtxMult - perform matrix multiplication without sharing
     @params arrays A, B, C and dimension size N
     @return - void 
 */
@@ -36,7 +84,7 @@ __global__ void mtxMult(float *A, float *B, float *C, int N){
 void setup(int dim, bool isSmall){
     // Block and Tile Size
     int N = dim;
-    int T = 1;
+    int T = 8;
     size_t memSize = N * N * sizeof(int);
     
     printf("Running on N = %d\n", N);
@@ -76,7 +124,7 @@ void setup(int dim, bool isSmall){
     // launch kernel
     dim3 dimGrid(N, N);
     dim3 dimBlock(T, T);
-    mtxMult<<< dimGrid, dimBlock >>>(d_A, d_B, d_C, N);
+    sharedMtxMult<<< dimGrid, dimBlock >>>(d_A, d_B, d_C, N);
 
     // device to host copy
     cudaMemcpy(C_GPU, d_C, memSize, cudaMemcpyDeviceToHost );
